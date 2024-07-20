@@ -1,23 +1,24 @@
 -- Enum Types
-CREATE TYPE PaymentMethod AS ENUM ('BANK', 'CC');
-CREATE TYPE PaymentStatus AS ENUM ('UNPAID', 'PAID', 'VERIFICATION', 'SENDING', 'SENT');
-CREATE TYPE OrderItemType AS ENUM ('PRODUCT', 'EXPEDITION');
-
+CREATE TYPE "PaymentMethod" AS ENUM ('BANK', 'CC');
+CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'CANCEL');
+CREATE TYPE "OrderStatus" AS ENUM ('VERIFICATION', 'SENDING', 'SENT');
+CREATE TYPE "OrderItemType" AS ENUM ('PRODUCT', 'EXPEDITION');
+CREATE TYPE "RoleType" AS ENUM('ADMIN','CUSTOMER')
 -- Table Definitions
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    nama VARCHAR(250) NOT NULL,
+    name VARCHAR(250) NOT NULL,
     email VARCHAR(250) NOT NULL UNIQUE,
     username VARCHAR(250) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL,
-    role VARCHAR(50) NOT NULL
+    role RoleType NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_details (
     id SERIAL PRIMARY KEY,
     address TEXT NOT NULL,
-    phone VARCHAR(30) NOT NULL,
-    postal_code VARCHAR(15) NOT NULL,
+    phone VARCHAR(13) NOT NULL,
+    postal_code VARCHAR(5) NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -47,6 +48,7 @@ CREATE TABLE IF NOT EXISTS orders (
     payment_method PaymentMethod DEFAULT NULL,
     payment_proof VARCHAR(250) DEFAULT NULL,
     status PaymentStatus NOT NULL,
+    order_status OrderStatus NOT NULL
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -57,14 +59,9 @@ CREATE TABLE IF NOT EXISTS order_items (
     price DECIMAL(10,0) NOT NULL,
     discount DECIMAL(10,0) NOT NULL,
     total_price DECIMAL(10,0) NOT NULL,
+    quantity INT NOT NULL DEFAULT 1,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS settings (
-    id SERIAL PRIMARY KEY,
-    setting_name VARCHAR(250) NOT NULL UNIQUE,
-    setting_value TEXT NOT NULL
 );
