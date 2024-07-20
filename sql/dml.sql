@@ -1,8 +1,8 @@
 -- user membuat order baru dan membeli 3 produk dengan order yang sama
 -- > Insert new order
 WITH new_order AS (
-    INSERT INTO orders (order_date, order_expired, tracking_number, payment_method, payment_proof, status, user_id)
-    VALUES ('2024-07-10 10:00:00', '2024-07-15 10:00:00', 'TRACK567890', 'BANK', 'https://picsum.photos/200', 'UNPAID', (SELECT id FROM users WHERE username = 'peter'))
+    INSERT INTO orders (order_date, order_expired, tracking_number, payment_method, payment_proof, status, user_id, order_status)
+    VALUES ('2024-07-10 10:00:00', '2024-07-15 10:00:00', 'TRACK567890', 'BANK', 'https://picsum.photos/200', 'UNPAID', (SELECT id FROM users WHERE username = 'peter'), 'SENDING')
     RETURNING id
 )
 -- > Insert order items
