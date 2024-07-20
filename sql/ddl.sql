@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     email VARCHAR(250) NOT NULL UNIQUE,
     username VARCHAR(250) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL,
-    role RoleType NOT NULL
+    role "RoleType" NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_details (
@@ -45,17 +45,17 @@ CREATE TABLE IF NOT EXISTS orders (
     order_date TIMESTAMP NOT NULL,
     order_expired TIMESTAMP NOT NULL,
     tracking_number VARCHAR(250) DEFAULT NULL UNIQUE,
-    payment_method PaymentMethod DEFAULT NULL,
+    payment_method "PaymentMethod" DEFAULT NULL,
     payment_proof VARCHAR(250) DEFAULT NULL,
-    status PaymentStatus NOT NULL,
-    order_status OrderStatus NOT NULL
+    status "PaymentStatus" NOT NULL,
+    order_status "OrderStatus" NOT NULL
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
-    type OrderItemType NOT NULL,
+    type "OrderItemType" NOT NULL,
     price DECIMAL(10,0) NOT NULL,
     discount DECIMAL(10,0) NOT NULL,
     total_price DECIMAL(10,0) NOT NULL,
