@@ -6,13 +6,14 @@ WITH new_order AS (
     RETURNING id
 )
 -- > Insert order items
-INSERT INTO order_items (type, price, discount, total_price, order_id, product_id)
+INSERT INTO order_items (type, price, discount, total_price, order_id, product_id, quantity)
 SELECT 'PRODUCT', 
        p.price, 
        p.discount, 
        p.price - p.discount, 
        no.id AS order_id, 
-       p.id
+       p.id,
+       1
 FROM new_order no
 JOIN products p ON p.title IN ('Bluetooth Speaker', 'Smartphone X', 'Wireless Headphones');
 
@@ -41,7 +42,7 @@ WHERE id = (SELECT id FROM orders ORDER BY order_date DESC LIMIT 1);
 -- Sebagai pengguna, saya ingin memperbarui informasi akun saya, seperti nama, email, dan alamat pengiriman.
 -- > Update user information
 UPDATE users
-SET nama = 'Peter Jack Kambey Updated', email = 'peter.updated@example.com'
+SET name = 'Peter Jack Kambey Updated', email = 'peter.updated@example.com'
 WHERE username = 'peter';
 
 -- > Update user details
@@ -61,7 +62,7 @@ FROM orders;
 
 -- > Update order status
 UPDATE orders
-SET status = 'SENDING'
+SET order_status = 'SENDING'
 WHERE id = (SELECT id FROM orders ORDER BY order_date DESC LIMIT 1);
 
 -- Sebagai admin, saya ingin melihat laporan penjualan dan data pengguna untuk menganalisis kinerja aplikasi dan perilaku pengguna.
@@ -72,7 +73,7 @@ JOIN products p ON oi.product_id = p.id
 GROUP BY p.title;
 
 -- > View user data
-SELECT u.nama, u.email, COUNT(o.id) AS total_orders
+SELECT u.name, u.email, COUNT(o.id) AS total_orders
 FROM users u
 LEFT JOIN orders o ON u.id = o.user_id
 GROUP BY u.id;

@@ -1,10 +1,10 @@
 -- Insert data into users table with UPSERT
-INSERT INTO users (id, nama, email, username, password, role) VALUES
-(1, 'Peter Jack Kambey', 'peter@example.com', 'peter', 'admin#1234', 'admin'),
-(2, 'Hans Jeffrey', 'hans.jeffrey@example.com', 'hans', 'admin#1234', 'customer'),
-(3, 'Zidane Sc', 'zidane.sc@example.com', 'zidane', 'admin#1234', 'customer'),
-(4, 'Saddam Satria', 'saddam.satria@example.com', 'saddam', 'admin#1234', 'customer'),
-(5, 'Citra Dwi', 'citra.dwi@example.com', 'citra', 'admin#1234', 'customer')
+INSERT INTO users (id, name, email, username, password, role) VALUES
+(1, 'Peter Jack Kambey', 'peter@example.com', 'peter', 'admin#1234', 'ADMIN'),
+(2, 'Hans Jeffrey', 'hans.jeffrey@example.com', 'hans', 'admin#1234', 'CUSTOMER'),
+(3, 'Zidane Sc', 'zidane.sc@example.com', 'zidane', 'admin#1234', 'CUSTOMER'),
+(4, 'Saddam Satria', 'saddam.satria@example.com', 'saddam', 'admin#1234', 'CUSTOMER'),
+(5, 'Citra Dwi', 'citra.dwi@example.com', 'citra', 'admin#1234', 'CUSTOMER')
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert data into user_details table with UPSERT
@@ -35,37 +35,27 @@ INSERT INTO product_images (id, image_title, image_path, product_id) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert data into orders table with UPSERT
-INSERT INTO orders (id, order_date, order_expired, tracking_number, payment_method, payment_proof, status, user_id) VALUES
-(1, '2024-07-01 10:00:00', '2024-07-07 10:00:00', 'TRACK123456', 'BANK', 'https://picsum.photos/200', 'PAID', 1),
-(2, '2024-07-02 11:00:00', '2024-07-08 11:00:00', 'TRACK789012', 'CC', 'https://picsum.photos/200', 'SENDING', 2),
-(3, '2024-07-03 12:00:00', '2024-07-09 12:00:00', NULL, 'BANK', 'https://picsum.photos/200', 'UNPAID', 3),
-(4, '2024-07-04 13:00:00', '2024-07-10 13:00:00', 'TRACK345678', 'CC', 'https://picsum.photos/200', 'VERIFICATION', 4),
-(5, '2024-07-05 14:00:00', '2024-07-11 14:00:00', 'TRACK901234', 'BANK', 'https://picsum.photos/200', 'SENT', 5)
+INSERT INTO orders (id, order_date, order_expired, tracking_number, payment_method, payment_proof, status, order_status, user_id) VALUES
+(1, '2024-07-01 10:00:00', '2024-07-07 10:00:00', 'TRACK123456', 'BANK', 'https://picsum.photos/200', 'PAID', 'VERIFICATION', 2),
+(2, '2024-07-02 11:00:00', '2024-07-08 11:00:00', 'TRACK789012', 'CC', 'https://picsum.photos/200', 'PAID', 'SENDING', 2),
+(3, '2024-07-03 12:00:00', '2024-07-09 12:00:00', NULL, 'BANK', 'https://picsum.photos/200', 'UNPAID', 'VERIFICATION', 3),
+(4, '2024-07-04 13:00:00', '2024-07-10 13:00:00', 'TRACK345678', 'CC', 'https://picsum.photos/200', 'PAID', 'SENDING', 4),
+(5, '2024-07-05 14:00:00', '2024-07-11 14:00:00', 'TRACK901234', 'BANK', 'https://picsum.photos/200', 'PAID', 'SENT', 5)
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert data into order_items table with UPSERT
-INSERT INTO order_items (id, type, price, discount, total_price, order_id, product_id) VALUES
-(1, 'PRODUCT', 150000, 20000, 130000, 1, 1),
-(2, 'PRODUCT', 3000000, 250000, 2750000, 2, 2),
-(3, 'PRODUCT', 750000, 100000, 650000, 3, 3),
-(4, 'PRODUCT', 12000000, 1500000, 10500000, 4, 4),
-(5, 'PRODUCT', 5000000, 500000, 4500000, 5, 5)
+INSERT INTO order_items (id, type, price, discount, total_price, quantity, order_id, product_id) VALUES
+(1, 'PRODUCT', 150000, 20000, 130000, 1, 1, 1),
+(2, 'PRODUCT', 3000000, 250000, 2750000, 1, 2, 2),
+(3, 'PRODUCT', 750000, 100000, 650000, 1, 3, 3),
+(4, 'PRODUCT', 12000000, 1500000, 10500000, 1, 4, 4),
+(5, 'PRODUCT', 5000000, 500000, 4500000, 1, 5, 5)
 ON CONFLICT (id) DO NOTHING;
 
--- Insert data into settings table with UPSERT
-INSERT INTO settings (id, setting_name, setting_value) VALUES
-(1, 'site_name', 'My E-Commerce Site'),
-(2, 'site_url', 'http://example.com'),
-(3, 'contact_email', 'support@example.com'),
-(4, 'currency', 'IDR'),
-(5, 'timezone', 'Asia/Jakarta')
-ON CONFLICT (id) DO NOTHING;
-
--- update sequence for all table
+-- Update sequence for all tables
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 SELECT setval('user_details_id_seq', (SELECT MAX(id) FROM user_details));
 SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
 SELECT setval('product_images_id_seq', (SELECT MAX(id) FROM product_images));
 SELECT setval('orders_id_seq', (SELECT MAX(id) FROM orders));
 SELECT setval('order_items_id_seq', (SELECT MAX(id) FROM order_items));
-SELECT setval('settings_id_seq', (SELECT MAX(id) FROM settings));

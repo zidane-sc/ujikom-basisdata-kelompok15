@@ -75,25 +75,27 @@ kami menggunakan sumber database dari [GitHub - Jize](https://github.com/chiqors
 ### DDL
 ```sql
 -- Enum Types
-CREATE TYPE PaymentMethod AS ENUM ('BANK', 'CC');
-CREATE TYPE PaymentStatus AS ENUM ('UNPAID', 'PAID', 'VERIFICATION', 'SENDING', 'SENT');
-CREATE TYPE OrderItemType AS ENUM ('PRODUCT', 'EXPEDITION');
+CREATE TYPE "PaymentMethod" AS ENUM ('BANK', 'CC');
+CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'CANCEL');
+CREATE TYPE "OrderStatus" AS ENUM ('VERIFICATION', 'SENDING', 'SENT');
+CREATE TYPE "OrderItemType" AS ENUM ('PRODUCT', 'EXPEDITION');
+CREATE TYPE "RoleType" AS ENUM('ADMIN','CUSTOMER');
 
 -- Table Definitions
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    nama VARCHAR(250) NOT NULL,
+    name VARCHAR(250) NOT NULL,
     email VARCHAR(250) NOT NULL UNIQUE,
     username VARCHAR(250) NOT NULL UNIQUE,
     password VARCHAR(50) NOT NULL,
-    role VARCHAR(50) NOT NULL
+    role "RoleType" NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_details (
     id SERIAL PRIMARY KEY,
     address TEXT NOT NULL,
-    phone VARCHAR(30) NOT NULL,
-    postal_code VARCHAR(15) NOT NULL,
+    phone VARCHAR(13) NOT NULL,
+    postal_code VARCHAR(5) NOT NULL,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
@@ -120,41 +122,37 @@ CREATE TABLE IF NOT EXISTS orders (
     order_date TIMESTAMP NOT NULL,
     order_expired TIMESTAMP NOT NULL,
     tracking_number VARCHAR(250) DEFAULT NULL UNIQUE,
-    payment_method PaymentMethod DEFAULT NULL,
+    payment_method "PaymentMethod" DEFAULT NULL,
     payment_proof VARCHAR(250) DEFAULT NULL,
-    status PaymentStatus NOT NULL,
+    status "PaymentStatus" NOT NULL,
+    order_status "OrderStatus" NOT null,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS order_items (
     id SERIAL PRIMARY KEY,
-    type OrderItemType NOT NULL,
+    type "OrderItemType" NOT NULL,
     price DECIMAL(10,0) NOT NULL,
     discount DECIMAL(10,0) NOT NULL,
     total_price DECIMAL(10,0) NOT NULL,
+    quantity INT DEFAULT 1,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-);
-
-CREATE TABLE IF NOT EXISTS settings (
-    id SERIAL PRIMARY KEY,
-    setting_name VARCHAR(250) NOT NULL UNIQUE,
-    setting_value TEXT NOT NULL
 );
 ```
 
 ### Seed
 ```sql
 -- Insert data into users table with UPSERT
-INSERT INTO users (id, nama, email, username, password, role) VALUES
-(1, 'Peter Jack Kambey', 'peter@example.com', 'peter', 'admin#1234', 'admin'),
-(2, 'Hans Jeffrey', 'hans.jeffrey@example.com', 'hans', 'admin#1234', 'customer'),
-(3, 'Zidane Sc', 'zidane.sc@example.com', 'zidane', 'admin#1234', 'customer'),
-(4, 'Saddam Satria', 'saddam.satria@example.com', 'saddam', 'admin#1234', 'customer'),
-(5, 'Citra Dwi', 'citra.dwi@example.com', 'citra', 'admin#1234', 'customer')
+INSERT INTO users (id, name, email, username, password, role) VALUES
+(1, 'Peter Jack Kambey', 'peter@example.com', 'peter', 'admin#1234', 'ADMIN'),
+(2, 'Hans Jeffrey', 'hans.jeffrey@example.com', 'hans', 'admin#1234', 'CUSTOMER'),
+(3, 'Zidane Sc', 'zidane.sc@example.com', 'zidane', 'admin#1234', 'CUSTOMER'),
+(4, 'Saddam Satria', 'saddam.satria@example.com', 'saddam', 'admin#1234', 'CUSTOMER'),
+(5, 'Citra Dwi', 'citra.dwi@example.com', 'citra', 'admin#1234', 'CUSTOMER')
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert data into user_details table with UPSERT
@@ -185,40 +183,30 @@ INSERT INTO product_images (id, image_title, image_path, product_id) VALUES
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert data into orders table with UPSERT
-INSERT INTO orders (id, order_date, order_expired, tracking_number, payment_method, payment_proof, status, user_id) VALUES
-(1, '2024-07-01 10:00:00', '2024-07-07 10:00:00', 'TRACK123456', 'BANK', 'https://picsum.photos/200', 'PAID', 1),
-(2, '2024-07-02 11:00:00', '2024-07-08 11:00:00', 'TRACK789012', 'CC', 'https://picsum.photos/200', 'SENDING', 2),
-(3, '2024-07-03 12:00:00', '2024-07-09 12:00:00', NULL, 'BANK', 'https://picsum.photos/200', 'UNPAID', 3),
-(4, '2024-07-04 13:00:00', '2024-07-10 13:00:00', 'TRACK345678', 'CC', 'https://picsum.photos/200', 'VERIFICATION', 4),
-(5, '2024-07-05 14:00:00', '2024-07-11 14:00:00', 'TRACK901234', 'BANK', 'https://picsum.photos/200', 'SENT', 5)
+INSERT INTO orders (id, order_date, order_expired, tracking_number, payment_method, payment_proof, status, order_status, user_id) VALUES
+(1, '2024-07-01 10:00:00', '2024-07-07 10:00:00', 'TRACK123456', 'BANK', 'https://picsum.photos/200', 'PAID', 'VERIFICATION', 2),
+(2, '2024-07-02 11:00:00', '2024-07-08 11:00:00', 'TRACK789012', 'CC', 'https://picsum.photos/200', 'PAID', 'SENDING', 2),
+(3, '2024-07-03 12:00:00', '2024-07-09 12:00:00', NULL, 'BANK', 'https://picsum.photos/200', 'UNPAID', 'VERIFICATION', 3),
+(4, '2024-07-04 13:00:00', '2024-07-10 13:00:00', 'TRACK345678', 'CC', 'https://picsum.photos/200', 'PAID', 'SENDING', 4),
+(5, '2024-07-05 14:00:00', '2024-07-11 14:00:00', 'TRACK901234', 'BANK', 'https://picsum.photos/200', 'PAID', 'SENT', 5)
 ON CONFLICT (id) DO NOTHING;
 
 -- Insert data into order_items table with UPSERT
-INSERT INTO order_items (id, type, price, discount, total_price, order_id, product_id) VALUES
-(1, 'PRODUCT', 150000, 20000, 130000, 1, 1),
-(2, 'PRODUCT', 3000000, 250000, 2750000, 2, 2),
-(3, 'PRODUCT', 750000, 100000, 650000, 3, 3),
-(4, 'PRODUCT', 12000000, 1500000, 10500000, 4, 4),
-(5, 'PRODUCT', 5000000, 500000, 4500000, 5, 5)
+INSERT INTO order_items (id, type, price, discount, total_price, quantity, order_id, product_id) VALUES
+(1, 'PRODUCT', 150000, 20000, 130000, 1, 1, 1),
+(2, 'PRODUCT', 3000000, 250000, 2750000, 1, 2, 2),
+(3, 'PRODUCT', 750000, 100000, 650000, 1, 3, 3),
+(4, 'PRODUCT', 12000000, 1500000, 10500000, 1, 4, 4),
+(5, 'PRODUCT', 5000000, 500000, 4500000, 1, 5, 5)
 ON CONFLICT (id) DO NOTHING;
 
--- Insert data into settings table with UPSERT
-INSERT INTO settings (id, setting_name, setting_value) VALUES
-(1, 'site_name', 'My E-Commerce Site'),
-(2, 'site_url', 'http://example.com'),
-(3, 'contact_email', 'support@example.com'),
-(4, 'currency', 'IDR'),
-(5, 'timezone', 'Asia/Jakarta')
-ON CONFLICT (id) DO NOTHING;
-
--- update sequence for all table
+-- Update sequence for all tables
 SELECT setval('users_id_seq', (SELECT MAX(id) FROM users));
 SELECT setval('user_details_id_seq', (SELECT MAX(id) FROM user_details));
 SELECT setval('products_id_seq', (SELECT MAX(id) FROM products));
 SELECT setval('product_images_id_seq', (SELECT MAX(id) FROM product_images));
 SELECT setval('orders_id_seq', (SELECT MAX(id) FROM orders));
 SELECT setval('order_items_id_seq', (SELECT MAX(id) FROM order_items));
-SELECT setval('settings_id_seq', (SELECT MAX(id) FROM settings));
 ```
 
 ### DML with User Story
@@ -226,18 +214,19 @@ SELECT setval('settings_id_seq', (SELECT MAX(id) FROM settings));
 ```sql
 -- > Insert new order
 WITH new_order AS (
-    INSERT INTO orders (order_date, order_expired, tracking_number, payment_method, payment_proof, status, user_id)
-    VALUES ('2024-07-10 10:00:00', '2024-07-15 10:00:00', 'TRACK567890', 'BANK', 'https://picsum.photos/200', 'UNPAID', (SELECT id FROM users WHERE username = 'peter'))
+    INSERT INTO orders (order_date, order_expired, tracking_number, payment_method, payment_proof, status, user_id, order_status)
+    VALUES ('2024-07-10 10:00:00', '2024-07-15 10:00:00', 'TRACK567890', 'BANK', 'https://picsum.photos/200', 'UNPAID', (SELECT id FROM users WHERE username = 'hans'), 'VERIFICATION')
     RETURNING id
 )
 -- > Insert order items
-INSERT INTO order_items (type, price, discount, total_price, order_id, product_id)
+INSERT INTO order_items (type, price, discount, total_price, order_id, product_id, quantity)
 SELECT 'PRODUCT', 
        p.price, 
        p.discount, 
        p.price - p.discount, 
        no.id AS order_id, 
-       p.id
+       p.id,
+       1
 FROM new_order no
 JOIN products p ON p.title IN ('Bluetooth Speaker', 'Smartphone X', 'Wireless Headphones');
 ```
@@ -247,7 +236,7 @@ SELECT o.id AS order_id, o.order_date, o.order_expired, p.title, oi.price, oi.di
 FROM orders o
 JOIN order_items oi ON o.id = oi.order_id
 JOIN products p ON oi.product_id = p.id
-WHERE o.user_id = (SELECT id FROM users WHERE username = 'peter');
+WHERE o.user_id = (SELECT id FROM users WHERE username = 'hans');
 ```
 3. Sebagai pengguna, saya ingin melihat daftar produk beserta detailnya (gambar, harga, deskripsi) sehingga saya dapat memilih produk yang ingin dibeli
 ```sql
@@ -271,7 +260,7 @@ WHERE id = (SELECT id FROM orders ORDER BY order_date DESC LIMIT 1);
 ```sql
 -- > Update user information
 UPDATE users
-SET nama = 'Peter Jack Kambey Updated', email = 'peter.updated@example.com'
+SET name = 'Peter Jack Kambey Updated', email = 'peter.updated@example.com'
 WHERE username = 'peter';
 
 UPDATE user_details
@@ -292,8 +281,8 @@ FROM orders;
 
 -- > Update order status
 UPDATE orders
-SET status = 'SENDING'
-WHERE id = (SELECT id FROM orders ORDER BY order_date DESC LIMIT 1);
+SET order_status = 'SENDING'
+WHERE id = (SELECT id FROM orders ORDER BY id DESC LIMIT 1);
 ```
 9. Sebagai admin, saya ingin melihat laporan penjualan dan data pengguna untuk menganalisis kinerja aplikasi dan perilaku pengguna.
 ```sql
@@ -304,8 +293,19 @@ JOIN products p ON oi.product_id = p.id
 GROUP BY p.title;
 
 -- > View user data
-SELECT u.nama, u.email, COUNT(o.id) AS total_orders
+SELECT u.name, u.email, COUNT(o.id) AS total_orders
 FROM users u
 LEFT JOIN orders o ON u.id = o.user_id
 GROUP BY u.id;
 ```   
+
+
+### Delete all tables
+```sql
+DROP TABLE order_items;
+DROP TABLE product_images ;
+DROP TABLE orders;
+DROP TABLE products ;
+DROP TABLE user_details ;
+DROP TABLE users ;
+```

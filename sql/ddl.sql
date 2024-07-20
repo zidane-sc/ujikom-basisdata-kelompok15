@@ -3,7 +3,8 @@ CREATE TYPE "PaymentMethod" AS ENUM ('BANK', 'CC');
 CREATE TYPE "PaymentStatus" AS ENUM ('UNPAID', 'PAID', 'CANCEL');
 CREATE TYPE "OrderStatus" AS ENUM ('VERIFICATION', 'SENDING', 'SENT');
 CREATE TYPE "OrderItemType" AS ENUM ('PRODUCT', 'EXPEDITION');
-CREATE TYPE "RoleType" AS ENUM('ADMIN','CUSTOMER')
+CREATE TYPE "RoleType" AS ENUM('ADMIN','CUSTOMER');
+
 -- Table Definitions
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
@@ -48,7 +49,7 @@ CREATE TABLE IF NOT EXISTS orders (
     payment_method "PaymentMethod" DEFAULT NULL,
     payment_proof VARCHAR(250) DEFAULT NULL,
     status "PaymentStatus" NOT NULL,
-    order_status "OrderStatus" NOT NULL
+    order_status "OrderStatus" NOT null,
     user_id INT NOT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
