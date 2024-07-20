@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS order_items (
     price DECIMAL(10,0) NOT NULL,
     discount DECIMAL(10,0) NOT NULL,
     total_price DECIMAL(10,0) NOT NULL,
-    quantity INT NOT NULL DEFAULT 1,
+    quantity INT DEFAULT 1,
     order_id INT NOT NULL,
     product_id INT NOT NULL,
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
