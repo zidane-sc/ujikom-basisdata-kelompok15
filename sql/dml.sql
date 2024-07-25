@@ -57,7 +57,7 @@ ON CONFLICT (slug) DO NOTHING;
 
 -- Sebagai admin, saya ingin melihat daftar pesanan dan mengelola status pesanan (misalnya belum dibayar, sedang diproses, dikirim).
 -- > View all orders
-SELECT id, order_date, status, user_id
+SELECT id, order_date, status, order_status, user_id
 FROM orders;
 
 -- > Update order status
