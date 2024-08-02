@@ -62,7 +62,8 @@ kami menggunakan sumber database dari [GitHub - Jize](https://github.com/chiqors
 8. Manajemen produk oleh admin
 9. Manajemen order oleh admin
 -->
-![image](https://github.com/user-attachments/assets/1fecc71a-4e95-4a80-a5aa-60ca9283d272)
+![image](https://github.com/user-attachments/assets/cb60cb95-6aae-46e2-b15a-31628e963733)
+
 
 
 ### UML
