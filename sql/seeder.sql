@@ -39,7 +39,7 @@ INSERT INTO orders (id, order_date, order_expired, tracking_number, payment_meth
 (1, '2024-07-01 10:00:00', '2024-07-07 10:00:00', 'TRACK123456', 'BANK', 'https://picsum.photos/200', 'PAID', 'VERIFICATION', 2),
 (2, '2024-07-02 11:00:00', '2024-07-08 11:00:00', 'TRACK789012', 'CC', 'https://picsum.photos/200', 'PAID', 'SENDING', 2),
 (3, '2024-07-03 12:00:00', '2024-07-09 12:00:00', NULL, 'BANK', 'https://picsum.photos/200', 'UNPAID', 'VERIFICATION', 3),
-(4, '2024-07-04 13:00:00', '2024-07-10 13:00:00', 'TRACK345678', 'CC', 'https://picsum.photos/200', 'PAID', 'SENDING', 4),
+(4, '2024-07-04 13:00:00', '2024-07-10 13:00:00', 'TRACK345678', 'CC', 'https://picsum.photos/200', 'PAID', 'SENT', 4),
 (5, '2024-07-05 14:00:00', '2024-07-11 14:00:00', 'TRACK901234', 'BANK', 'https://picsum.photos/200', 'PAID', 'SENT', 5)
 ON CONFLICT (id) DO NOTHING;
 
